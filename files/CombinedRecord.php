@@ -62,6 +62,8 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
         $active_combined_query = Yii::createObject(ActiveCombinedQuery::className(), [$general_class]);
         $active_combined_query->combined_class = get_called_class();
         $active_combined_query->language_class = $language_class;
+        $other_table = $language_class::tableName();
+        $active_combined_query->innerJoin($other_table, $other_table . '.' . $language_class::fkToGeneralTable() . ' = ' . $general_class::tableName() . '.id');
         return $active_combined_query;
     }
 

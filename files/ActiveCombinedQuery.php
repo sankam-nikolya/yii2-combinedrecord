@@ -111,10 +111,6 @@ class ActiveCombinedQuery extends ActiveQuery {
         return $models;
     }
 
-    public function count($q = '*', $db = null) {
-        throw new Exception('Function not supported yet');
-    }
-
     public function sum($q, $db = null) {
         throw new Exception('Function not supported yet');
     }
