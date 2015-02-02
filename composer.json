@@ -1,0 +1,19 @@
+{
+    "name": "branchonline/yii2-combinedrecord",
+    "description": "Combined Record structure for Yii2",
+    "authors": [
+        {
+            "name": "Jap Mul",
+            "email": "jap@branchonline.nl"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "branchonline\\combinedrecord\\": ""
+        }
+    }
+}
