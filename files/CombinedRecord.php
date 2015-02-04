@@ -93,7 +93,7 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
 
         $scope = is_null($this->formName()) ? 0 : $this->formName();
         $collection = isset($params[$scope]) ? $params[$scope] : $params;
-       
+
         $query->andFilterWhere($collection);
 
         return $dataProvider;
@@ -198,11 +198,26 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
     }
 
     public function __get($name) {
-        if ($this->_general_record->hasAttribute($name)) {
+        $getter = 'get' . ucfirst($name);
+//        
+//        echo '<pre>';
+//        print_r($getter);
+//        echo '</pre>';
+
+        if (method_exists($this->_general_record, $getter)) {
+            return $this->_general_record->$getter();
+        } else if (method_exists($this->_other_record, $getter)) {
+            return $this->_other_record->$getter();
+        }
+//        echo $getter;
+
+
+        if ($this->_general_record->hasAttribute($name) || method_exists($this->_general_record, $getter)) {
             return $this->_general_record->$name;
         } else if ($this->_other_record->hasAttribute($name)) {
             return $this->_other_record->$name;
         }
+        parent::__get();
     }
 
     public function __set($name, $value) {
