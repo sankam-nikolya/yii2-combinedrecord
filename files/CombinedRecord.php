@@ -4,6 +4,7 @@ namespace branchonline\combinedrecord\files;
 
 use Yii;
 use yii\base\Model;
+use yii\data\ActiveDataProvider;
 use yii\db\ActiveRecordInterface;
 
 /**
@@ -44,6 +45,14 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
         }
     }
 
+    public function getGeneralRecord() {
+        return $this->_general_record;
+    }
+
+    public function getOtherRecord() {
+        return $this->_other_record;
+    }
+
     public function setGeneralRecord($record) {
         $this->_new_record = false;
         $this->_general_record = $record;
@@ -67,25 +76,49 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
         return $active_combined_query;
     }
 
+    public function search($params) {
+        $query = self::findByClasses($this->_general_class, $this->_other_class);
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        $dataProvider->pagination = [
+            'defaultPageSize' => 5,
+        ];
+
+        if (!$this->load($params)) {
+            return $dataProvider;
+        }
+
+        $scope = is_null($this->formName()) ? 0 : $this->formName();
+        $collection = isset($params[$scope]) ? $params[$scope] : $params;
+       
+        $query->andFilterWhere($collection);
+
+        return $dataProvider;
+    }
+
     public function load($data, $formName = NULL) {
         if (empty($data)) {
             return false;
         } else {
             $data_general = [];
-            $data_language = [];
+            $data_other = [];
 
-            foreach ($data['CombinedRecord'] as $k => $v) {
+            $scope = is_null($formName) ? $this->formName() : $formName;
+            $collection = isset($data[$scope]) ? $data[$scope] : $data;
+            foreach ($collection as $k => $v) {
                 if (in_array($k, $this->_general_attributes)) {
                     $data_general[$k] = $v;
                 } else if (in_array($k, $this->_other_attributes)) {
-                    $data_language[$k] = $v;
+                    $data_other[$k] = $v;
                 }
             }
-
             $loaded_general_data = $this->_general_record->load($data_general, '');
-            $loaded_language_data = $this->_other_record->load($data_language, '');
+            $loaded_other_data = $this->_other_record->load($data_other, '');
 
-            return ($loaded_general_data && $loaded_language_data);
+            return ($loaded_general_data && $loaded_other_data);
         }
     }
 
@@ -107,26 +140,26 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
         $validated_general_record = $this->_general_record->validate();
 
         // Remove FK from validation if this is a new record
-        $language_attributes_to_validate = $this->_other_attributes;
+        $other_attributes_to_validate = $this->_other_attributes;
 
         if ($this->isNewRecord()) {
-            $key = array_search($this->_join_table_fk_to_general_table, $language_attributes_to_validate);
-            unset($language_attributes_to_validate[$key]);
+            $key = array_search($this->_join_table_fk_to_general_table, $other_attributes_to_validate);
+            unset($other_attributes_to_validate[$key]);
         }
 
-        $validated_language_record = $this->_other_record->validate($language_attributes_to_validate);
+        $validated_other_record = $this->_other_record->validate($other_attributes_to_validate);
 
         if (!$validated_general_record) {
             $this->_addExternalErrors($this->_general_record->getErrors());
         }
 
-        if (!$validated_language_record) {
+        if (!$validated_other_record) {
             $this->_addExternalErrors($this->_other_record->getErrors());
         }
 
         $this->afterValidate();
 
-        return ($validated_general_record && $validated_language_record);
+        return ($validated_general_record && $validated_other_record);
     }
 
     public function save($runValidation = true, $attributeNames = null) {
