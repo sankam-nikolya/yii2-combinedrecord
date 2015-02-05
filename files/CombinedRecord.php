@@ -265,7 +265,7 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
     }
 
     public function hasAttribute($name) {
-        
+        return($this->_general_record->hasAttribute($name) || $this->_other_record->hasAttribute($name));
     }
 
     public function insert($runValidation = true, $attributes = null) {
