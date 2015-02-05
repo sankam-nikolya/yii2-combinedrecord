@@ -87,7 +87,7 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
             'defaultPageSize' => 5,
         ];
 
-        if (!$this->load($params)) {
+        if (!$this->load($params, null, false)) {
             return $dataProvider;
         }
 
@@ -99,7 +99,7 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
         return $dataProvider;
     }
 
-    public function load($data, $formName = NULL) {
+    public function load($data, $formName = NULL, $strict = true) {
         if (empty($data)) {
             return false;
         } else {
@@ -115,10 +115,15 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
                     $data_other[$k] = $v;
                 }
             }
+
             $loaded_general_data = $this->_general_record->load($data_general, '');
             $loaded_other_data = $this->_other_record->load($data_other, '');
 
-            return ($loaded_general_data && $loaded_other_data);
+            if ($strict) {
+                return ($loaded_general_data && $loaded_other_data);
+            } else {
+                return ($loaded_general_data || $loaded_other_data);
+            }
         }
     }
 
