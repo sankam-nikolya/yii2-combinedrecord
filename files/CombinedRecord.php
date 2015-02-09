@@ -213,16 +213,16 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
 
         if ($this->_general_record->hasAttribute($name) || property_exists($this->_general_record, $name)) {
             return $this->_general_record->$name;
-        } else if ($this->_other_record->hasAttribute($name)  || property_exists($this->_other_record, $name)) {
+        } else if ($this->_other_record->hasAttribute($name) || property_exists($this->_other_record, $name)) {
             return $this->_other_record->$name;
         }
         parent::__get();
     }
 
     public function __set($name, $value) {
-        if ($this->_general_record->hasAttribute($name)) {
+        if ($this->_general_record->hasAttribute($name) || property_exists($this->_general_record, $name)) {
             $this->_general_record->$name = $value;
-        } else if ($this->_other_record->hasAttribute($name)) {
+        } else if ($this->_other_record->hasAttribute($name) || property_exists($this->_other_record, $name)) {
             $this->_other_record->$name = $value;
         }
     }
