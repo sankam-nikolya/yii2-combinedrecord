@@ -67,12 +67,12 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
         $this->_other_record = $language_class::find()->where([$this->_join_table_fk_to_general_table => $fk_id])->one();
     }
 
-    public static function findByClasses($general_class, $language_class) {
+    public static function findByClasses($general_class, $other_class) {
         $active_combined_query = Yii::createObject(ActiveCombinedQuery::className(), [$general_class]);
         $active_combined_query->combined_class = get_called_class();
-        $active_combined_query->language_class = $language_class;
-        $other_table = $language_class::tableName();
-        $active_combined_query->innerJoin($other_table, $other_table . '.' . $language_class::fkToGeneralTable() . ' = ' . $general_class::tableName() . '.id');
+        $active_combined_query->language_class = $other_class;
+        $other_table = $other_class::tableName();
+        $active_combined_query->innerJoin($other_table, $other_table . '.' . $other_class::fkToGeneralTable() . ' = ' . $general_class::tableName() . '.id');
         return $active_combined_query;
     }
 
@@ -229,6 +229,14 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
 
     public function attributes() {
         return array_merge($this->_general_record->attributes(), $this->_other_record->attributes());
+    }
+    
+    public function getGeneralAttributes() {
+        return $this->_general_record->attributes();
+    }
+    
+    public function getOtherAttributes() {
+        return $this->_other_record->attributes();
     }
 
     public function afterFind() {
