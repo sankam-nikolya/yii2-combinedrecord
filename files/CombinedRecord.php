@@ -238,6 +238,14 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
     public function getOtherAttributes() {
         return $this->_other_record->attributes();
     }
+    
+    public function getGeneralTableSchema() {
+        return $this->_general_record->getTableSchema();
+    }
+    
+    public function getOtherTableSchema() {
+        return $this->_other_record->getTableSchema();
+    }
 
     public function afterFind() {
         $this->trigger(self::EVENT_AFTER_FIND);
