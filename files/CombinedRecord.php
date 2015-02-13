@@ -28,7 +28,14 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
     private $_other_attributes;
     private $_join_table_fk_to_general_table;
 
-    public function __construct($general_class, $other_class) {
+    /**
+     * 
+     * @param string $general_class
+     * @param string $other_class
+     * @param array $other_record_values this should be key, value pairs to be set on the
+     * other record
+     */
+    public function __construct($general_class, $other_class, $other_record_values = []) {
         parent::__construct();
 
         $this->_general_class = $general_class;
@@ -38,6 +45,14 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
         $this->_new_record = true;
         $this->_general_record = new $general_class;
         $this->_other_record = new $other_class;
+        
+        if(is_array($other_record_values) && !empty($other_record_values)) {
+            foreach($other_record_values as $k => $v) {
+                if($this->_other_record->hasAttribute($k)) {
+                    $this->_other_record->$k = $v;
+                }
+            }
+        }
 
         if (!is_null($this->_general_record) && !is_null($this->_other_record)) {
             $this->_general_attributes = $this->_general_record->attributes();
