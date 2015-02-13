@@ -109,16 +109,16 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
             $scope = is_null($formName) ? $this->formName() : $formName;
             $collection = isset($data[$scope]) ? $data[$scope] : $data;
             foreach ($collection as $k => $v) {
-                if (in_array($k, $this->_general_attributes)) {
+                if (in_array($k, $this->_general_attributes) || property_exists($this->_general_record, $k)) {
                     $data_general[$k] = $v;
-                } else if (in_array($k, $this->_other_attributes)) {
+                } else if (in_array($k, $this->_other_attributes) || property_exists($this->_other_record, $k)) {
                     $data_other[$k] = $v;
                 }
             }
 
             $loaded_general_data = $this->_general_record->load($data_general, '');
             $loaded_other_data = $this->_other_record->load($data_other, '');
-
+            
             if ($strict) {
                 return ($loaded_general_data && $loaded_other_data);
             } else {
@@ -180,7 +180,7 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
     }
 
     public function isNewRecord() {
-        return $this->_new_record;
+        return $this->_general_record->isNewRecord || $this->_other_record->isNewRecord;
     }
 
     public function insertModels() {
@@ -199,7 +199,7 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
     }
 
     public function updateModels() {
-        return ($this->_general_record->save(false) && $this->_other_record->save(false));
+        return ($this->_general_record->update(false) && $this->_other_record->update(false));
     }
 
     public function __get($name) {
