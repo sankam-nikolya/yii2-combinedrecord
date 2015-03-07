@@ -231,7 +231,7 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
         } else if ($this->_other_record->hasAttribute($name) || property_exists($this->_other_record, $name)) {
             return $this->_other_record->$name;
         }
-        parent::__get();
+        return false;
     }
 
     public function __set($name, $value) {
