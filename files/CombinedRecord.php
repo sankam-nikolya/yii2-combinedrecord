@@ -21,10 +21,10 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
 
     private $_new_record;
     private $_general_class;
-    private $_general_record;
+    protected $_general_record;
     private $_general_attributes;
     private $_other_class;
-    private $_other_record;
+    protected $_other_record;
     private $_other_attributes;
     private $_join_table_fk_to_general_table;
 
@@ -187,7 +187,7 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
             return false;
         }
 
-        if ($this->isNewRecord()) {
+        if ($this->isNewRecord()) {            
             return $this->insertModels();
         } else {
             return $this->updateModels() !== false;
@@ -198,7 +198,7 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
         return $this->_general_record->isNewRecord || $this->_other_record->isNewRecord;
     }
 
-    public function insertModels() {
+    public function insertModels() {        
         if ($this->_general_record->save()) {
             $fk = $this->_join_table_fk_to_general_table;
             $this->_other_record->$fk = $this->_general_record->id;
