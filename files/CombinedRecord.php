@@ -220,7 +220,7 @@ class CombinedRecord extends Model implements ActiveRecordInterface {
     public function __get($name) {
         $getter = 'get' . ucfirst($name);
 
-        if (method_exists($this->_general_record, $getter)) {
+        if (method_exists($this->_general_record, $getter) && !$this->_other_record->hasAttribute($name)) {
             return $this->_general_record->$getter();
         } else if (method_exists($this->_other_record, $getter)) {
             return $this->_other_record->$getter();
